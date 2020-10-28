@@ -154,8 +154,8 @@ class FlappyGame:
         # if (self.done):
         #     return self._getScreen()
         reward += self.act(action) 
-        for x in range(3):
-            reward += self.act(0) 
+        # for x in range(3):
+        #     reward += self.act(0) 
         # return self._getScreen(), reward, self.done, self.time, self.score
         return self._getValues(), reward, self.done, self.time, self.score
 
@@ -211,13 +211,6 @@ class FlappyGame:
                 self.score += 1
                 # self.SOUNDS['point'].play()
                 reward += 300
-        
-        # if self.upperPipes[0]['x'] < self.SCREENWIDTH:
-        #     pipeMidY, playerPosY, nextIndex = getNextPipeMidValue()
-        #     if abs(playerPosY - pipeMidY) > self.PIPEGAPSIZE:
-        #         reward -= 0.01 * abs(playerPosY - pipeMidY)
-        #     else:
-        #         reward += 0.01 * abs(playerPosY - pipeMidY)
 
         if (self.loopIter + 1) % 3 == 0:
             self.playerIndex = next(self.playerIndexGen)
@@ -286,7 +279,15 @@ class FlappyGame:
             nextPipe += 1
         targetTop = self.upperPipes[nextPipe]['y'] + self.IMAGES['pipe'][nextPipe].get_height()
         targetBottom = self.lowerPipes[nextPipe]['y']
-        return np.array([playerPosY, self.playerVelY, self.upperPipes[nextPipe]['x'], targetTop, targetBottom])
+        if nextPipe + 1 < len(self.upperPipes):
+            targetTop2 = self.upperPipes[nextPipe + 1]['y'] + self.IMAGES['pipe'][nextPipe].get_height()
+            targetBottom2 = self.lowerPipes[nextPipe + 1]['y']
+            targetX2 = self.upperPipes[nextPipe + 1]['x']
+        else:
+            targetTop2 = -1
+            targetBottom2 = -1
+            targetX2 = -1
+        return np.array([playerPosY, self.playerVelY, self.upperPipes[nextPipe]['x'], targetTop, targetBottom, targetX2, targetTop2, targetBottom2])
 
     def _getScreen(self):
         img = pygame.surfarray.array3d(self.SCREEN)

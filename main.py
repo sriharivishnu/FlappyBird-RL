@@ -22,9 +22,9 @@ if __name__ == "__main__":
     tf.compat.v1.disable_eager_execution()
     env = FlappyGame()
     lr = 0.001
-    n_games = 500
-    agent = Agent(gamma=0.99, epsilon=1.0, lr=lr, input_dims=(5,), action_dim=2, mem_size=1000000, batch_size=64,
-    epsilon_end=0.01, epsilon_dec=1e-3)
+    n_games = 300
+    agent = Agent(gamma=0.99, epsilon=1.0, lr=lr, input_dims=(8,), action_dim=2, mem_size=1000000, batch_size=64,
+    epsilon_end=0.01, epsilon_dec=1e-4)
     if (os.path.exists(agent.model_file)):
         agent.load_model()
         agent.epsilon = 0.01
