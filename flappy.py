@@ -212,12 +212,12 @@ class FlappyGame:
                 # self.SOUNDS['point'].play()
                 reward += 300
         
-        if self.upperPipes[0]['x'] < self.SCREENWIDTH:
-            pipeMidY, playerPosY, nextIndex = getNextPipeMidValue()
-            if abs(playerPosY - pipeMidY) > self.PIPEGAPSIZE:
-                reward -= 0.01 * abs(playerPosY - pipeMidY)
-            else:
-                reward += 0.01 * abs(playerPosY - pipeMidY)
+        # if self.upperPipes[0]['x'] < self.SCREENWIDTH:
+        #     pipeMidY, playerPosY, nextIndex = getNextPipeMidValue()
+        #     if abs(playerPosY - pipeMidY) > self.PIPEGAPSIZE:
+        #         reward -= 0.01 * abs(playerPosY - pipeMidY)
+        #     else:
+        #         reward += 0.01 * abs(playerPosY - pipeMidY)
 
         if (self.loopIter + 1) % 3 == 0:
             self.playerIndex = next(self.playerIndexGen)
@@ -282,7 +282,7 @@ class FlappyGame:
         nextPipe = 0
         playerPosY = self.playery + self.IMAGES['player'][0].get_height() / 2
         pipeWidth = self.IMAGES['pipe'][0].get_width()
-        while nextPipe < len(self.upperPipes) and self.upperPipes[nextPipe]['x'] + pipeWidth/2 < self.playerx:
+        while nextPipe < len(self.upperPipes) and self.upperPipes[nextPipe]['x'] + pipeWidth < self.playerx:
             nextPipe += 1
         targetTop = self.upperPipes[nextPipe]['y'] + self.IMAGES['pipe'][nextPipe].get_height()
         targetBottom = self.lowerPipes[nextPipe]['y']
