@@ -36,9 +36,6 @@ class ReplayBuffer():
     
 def build_dqn(lr, action_dim, input_dims, fc1_dims, fc2_dims, fc3_dims):
     model = keras.Sequential([
-        # keras.layers.Conv2D(32, kernel_size=8, strides=4, activation='relu'),
-        # keras.layers.Conv2D(64, kernel_size=4, strides=2, activation='relu'),
-        # keras.layers.Flatten(),
         keras.layers.Dense(fc1_dims, activation='relu'),
         keras.layers.Dense(fc2_dims, activation='relu'),
         keras.layers.Dense(fc3_dims, activation='relu'),
@@ -50,7 +47,7 @@ def build_dqn(lr, action_dim, input_dims, fc1_dims, fc2_dims, fc3_dims):
 
 class Agent():
     def __init__(self, lr, gamma, action_dim, epsilon, batch_size,
-    input_dims, epsilon_dec=1e-3, epsilon_end=0.01, mem_size=1000000, fname='dqn_model_flappy_V3.h5',
+    input_dims, epsilon_dec=1e-3, epsilon_end=0.01, mem_size=1000000, fname='dqn_model_flappy_V4.h5',
     fc1_dims=128, fc2_dims=64, fc3_dims=32, replace=100):
         self.action_space = [i for i in range(action_dim)]
         self.gamma = gamma
@@ -90,9 +87,8 @@ class Agent():
             self.q_next.set_weights(self.q_eval.get_weights())
         
         states, actions, rewards, states_, dones = self.memory.sample_buffer(self.batch_size)
-
-        q_pred = self.q_eval.predict(states)
-        q_next = self.q_next.predict(states_)
+        q_pred = self.q_eval.predict_on_batch(states)
+        q_next = self.q_next.predict_on_batch(states_)
         q_target = np.copy(q_pred)
         batch_index = np.arange(self.batch_size, dtype=np.int32)
 

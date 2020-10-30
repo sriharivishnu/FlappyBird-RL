@@ -5,6 +5,7 @@ import tensorflow as tf
 import numpy as np
 import os
 import gym
+from cnn import FrameAnalyze
 from QNetwork import Agent
 class FrameStacker():
     def __init__(self, input_dims, stack_size=4):
@@ -23,21 +24,26 @@ if __name__ == "__main__":
     env = FlappyGame()
     lr = 0.001
     n_games = 300
-    agent = Agent(gamma=0.99, epsilon=1.0, lr=lr, input_dims=(8,), action_dim=2, mem_size=1000000, batch_size=64,
+    agent = Agent(gamma=0.99, epsilon=1.0, lr=lr, input_dims=(8,), action_dim=2, mem_size=1000000, batch_size=128,
     epsilon_end=0.01, epsilon_dec=1e-4)
+    
+    # frame_analyze = FrameAnalyze((128,76,4), (8,))
     if (os.path.exists(agent.model_file)):
         agent.load_model()
         agent.epsilon = 0.01
+        agent.eps_min = 0.00
         print ("Loaded model from ", agent.model_file)
+    # if (os.path.exists(frame_analyze.))
 
     scores = []
     eps_hist = []
-    # frames = FrameStacker((128,76))
+    frames = FrameStacker((128,76))
     for i in range(n_games):
         done = False
         # frames.add(env.reset())
         # observation = frames.getStack()
         observation = env.reset()
+        # frames.add(observation)
         total_reward = 0
         while not done:
             action = agent.choose_action(observation)

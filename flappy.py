@@ -284,9 +284,10 @@ class FlappyGame:
             targetBottom2 = self.lowerPipes[nextPipe + 1]['y']
             targetX2 = self.upperPipes[nextPipe + 1]['x']
         else:
-            targetTop2 = -1
-            targetBottom2 = -1
-            targetX2 = -1
+            targetTop2 = self.SCREENHEIGHT / 2 - self.PIPEGAPSIZE / 2
+            targetBottom2 = self.SCREENHEIGHT / 2 + self.PIPEGAPSIZE / 2
+            targetX2 = 200
+        # print ([playerPosY, self.playerVelY, self.upperPipes[nextPipe]['x'], targetTop, targetBottom, targetX2, targetTop2, targetBottom2])
         return np.array([playerPosY, self.playerVelY, self.upperPipes[nextPipe]['x'], targetTop, targetBottom, targetX2, targetTop2, targetBottom2])
 
     def _getScreen(self):
