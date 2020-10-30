@@ -36,13 +36,14 @@ class ReplayBuffer():
     
 def build_dqn(lr, action_dim, input_dims, fc1_dims, fc2_dims, fc3_dims):
     model = keras.Sequential([
-        keras.layers.Dense(fc1_dims, activation='relu'),
+        keras.layers.Dense(fc1_dims, activation='relu', input_shape=input_dims),
         keras.layers.Dense(fc2_dims, activation='relu'),
         keras.layers.Dense(fc3_dims, activation='relu'),
         keras.layers.Dense(action_dim)
     ])
     model.compile(optimizer=keras.optimizers.Adam(learning_rate=lr), loss='mean_squared_error')
-    # print(model.summary())
+    print ("DQN SUMMARY")
+    print(model.summary())
     return model
 
 class Agent():
