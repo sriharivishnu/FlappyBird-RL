@@ -7,5 +7,5 @@ Used Reinforcement Learning to train an Agent to Play Flappy Bird (CNN currently
 Average score is approximately 20 after training. Looking to improve the algorithm. Please open an issue if there are some good ideas.
 
 ## Credits
-- Used Modified version of the Flappy Bird from https://github.com/sourabhv/FlapPyBird
+- Used a Modified version of the Open-Source Flappy Bird Game from https://github.com/sourabhv/FlapPyBird
 - QNetwork implementation inspiration from https://www.youtube.com/channel/UC58v9cLitc8VaCjrcKyAbrw
