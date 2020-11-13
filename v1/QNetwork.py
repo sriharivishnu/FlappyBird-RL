@@ -34,22 +34,27 @@ class ReplayBuffer():
 
         return states, actions, rewards, states_, terminal
     
-def build_dqn(lr, action_dim, input_dims, fc1_dims, fc2_dims, fc3_dims):
+def build_dqn(lr, action_dim, input_dims, fc1_dims, fc2_dims, fc3_dims, fc4_dims):
     model = keras.Sequential([
         keras.layers.Dense(fc1_dims, activation='relu', input_shape=input_dims),
         keras.layers.Dense(fc2_dims, activation='relu'),
-        keras.layers.Dense(fc3_dims, activation='relu'),
-        keras.layers.Dense(action_dim)
+        keras.layers.Dense(fc3_dims, activation='relu')
     ])
+    if (fc4_dims > 0):
+        model.add(keras.layers.Dense(fc4_dims, activation='relu'))
+    model.add(keras.layers.Dense(action_dim))
     model.compile(optimizer=keras.optimizers.Adam(learning_rate=lr), loss='mean_squared_error')
     print ("DQN SUMMARY")
     print(model.summary())
     return model
-
+"""
+V3, V4: 128, 64, 32
+V6: 128, 64, 32, 4
+"""
 class Agent():
     def __init__(self, lr, gamma, action_dim, epsilon, batch_size,
     input_dims, epsilon_dec=1e-3, epsilon_end=0.01, mem_size=1000000, fname='dqn_model_flappy_V4.h5',
-    fc1_dims=128, fc2_dims=64, fc3_dims=32, replace=100):
+    fc1_dims=128, fc2_dims=64, fc3_dims=32, fc4_dims=4, replace=100):
         self.action_space = [i for i in range(action_dim)]
         self.gamma = gamma
         self.epsilon = epsilon
@@ -62,8 +67,8 @@ class Agent():
 
         self.learn_count = 1
         self.memory = ReplayBuffer(mem_size, input_dims)
-        self.q_eval = build_dqn(lr, action_dim, input_dims, fc1_dims, fc2_dims, fc3_dims)
-        self.q_next = build_dqn(lr, action_dim, input_dims, fc1_dims, fc2_dims, fc3_dims)
+        self.q_eval = build_dqn(lr, action_dim, input_dims, fc1_dims, fc2_dims, fc3_dims, fc4_dims)
+        self.q_next = build_dqn(lr, action_dim, input_dims, fc1_dims, fc2_dims, fc3_dims, fc4_dims)
 
     def store_transition(self, state, action, reward, new_state, done):
         self.memory.store_transition(state, action, reward, new_state, done)

@@ -19,7 +19,6 @@ class Agent():
         self.moves = []
         self.mem_cntr = 0
         self.load()
-        print (self.q_table)
         
         # self.memory = ReplayBuffer(mem_size, input_dims)
         # self.q_eval = build_dqn(lr, action_dim, input_dims, fc1_dims, fc2_dims, fc3_dims)

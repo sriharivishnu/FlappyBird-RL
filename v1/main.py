@@ -1,4 +1,4 @@
-from flappy import FlappyGame
+from fast import FlappyGame
 from random import random
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -13,15 +13,16 @@ if __name__ == "__main__":
     tf.compat.v1.disable_eager_execution()
     env = FlappyGame()
     lr = 0.001
-    n_games = 30
+    n_games = 5000
     agent = Agent(gamma=0.9, epsilon=1.0, lr=lr, input_dims=(8,), action_dim=2, mem_size=1000000, batch_size=128,
-    epsilon_end=0.00, epsilon_dec=1e-4, fname='dqn_model_flappy_V6.h5')
+    epsilon_end=0.001, epsilon_dec=1e-5, fname='dqn_model_flappy_V6.h5', 
+    fc1_dims=128, fc2_dims=64, fc3_dims=32, fc4_dims=16)
     
-    frame_analyze = FrameAnalyze((4,128,76), (8,))
+    # frame_analyze = FrameAnalyze((4,128,76), (8,))
     if (os.path.exists(agent.model_file)):
         agent.load_model()
         agent.epsilon = 0.01
-        agent.eps_min = 0.00
+        # agent.eps_min = 0.00
         print ("Loaded model from ", agent.model_file)
     # if (os.path.exists(frame_analyze.model_file)):
     #     frame_analyze.load_model()
@@ -41,7 +42,7 @@ if __name__ == "__main__":
             agent.store_transition(observation, action, reward, observation_, done)
             # cv2.imshow("Cool", env._getScreen())
             # frame_analyze.store(env._getScreen(), observation_)
-            # agent.learn()
+            agent.learn()
             # frame_analyze.learn_vision()
             observation = observation_
         
