@@ -284,7 +284,7 @@ class FlappyGame:
             targetBottom2 = self.SCREENHEIGHT / 2 + self.PIPEGAPSIZE / 2
             targetX2 = 200
         # print ([playerPosY, self.playerVelY, self.upperPipes[nextPipe]['x'], targetTop, targetBottom, targetX2, targetTop2, targetBottom2])
-        return np.array([playerPosY, self.playerVelY, self.upperPipes[nextPipe]['x'], targetTop, targetBottom, targetX2, targetTop2, targetBottom2])
+        return np.array([playerPosY, self.playerVelY, self.upperPipes[nextPipe]['x'], (targetTop + targetBottom) / 2, targetX2, (targetTop2 + targetBottom2) / 2, self.playerRot])
 
     def _getScreen(self):
         img = pygame.surfarray.array3d(self.SCREEN)

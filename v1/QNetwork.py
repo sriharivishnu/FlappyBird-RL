@@ -1,8 +1,10 @@
 import numpy as np
 from tensorflow import keras
+import pickle
+import os
 import random
 class ReplayBuffer():
-    def __init__(self, max_size, input_dims):
+    def __init__(self, max_size, input_dims, fname="dqn_replay_buffer.pickle"):
         self.mem_size = max_size
         self.mem_cntr = 0
 
@@ -12,6 +14,8 @@ class ReplayBuffer():
         self.action_memory = np.zeros(self.mem_size, dtype=np.int32)
         self.reward_memory = np.zeros(self.mem_size, dtype=np.float32)
         self.terminal_memory = np.zeros(self.mem_size, dtype=np.int32)
+
+        self.fname = fname
     
     def store_transition(self, state, action, reward, state_, done):
         index = self.mem_cntr % self.mem_size
@@ -34,6 +38,28 @@ class ReplayBuffer():
 
         return states, actions, rewards, states_, terminal
     
+    def save(self):
+        values = {}
+        values['state_memory'] = self.state_memory
+        values['new_state_memory'] = self.new_state_memory
+        values['reward_memory'] = self.reward_memory
+        values['action_memory'] = self.action_memory
+        values['terminal_memory'] = self.terminal_memory
+        values['count'] = self.mem_cntr
+        with open(self.fname, 'wb') as fp:
+            pickle.dump(values, fp)
+    
+    def load(self):
+        if os.path.exists(self.fname):
+            with open(self.fname, 'rb') as fp:
+                values = pickle.load(fp)
+                self.state_memory = values['state_memory']
+                self.new_state_memory = values['new_state_memory']
+                self.reward_memory = values['reward_memory']
+                self.action_memory = values['action_memory']
+                self.terminal_memory = values['terminal_memory']
+                self.mem_cntr = values['count']
+    
 def build_dqn(lr, action_dim, input_dims, fc1_dims, fc2_dims, fc3_dims, fc4_dims):
     model = keras.Sequential([
         keras.layers.Dense(fc1_dims, activation='relu', input_shape=input_dims),
@@ -44,7 +70,6 @@ def build_dqn(lr, action_dim, input_dims, fc1_dims, fc2_dims, fc3_dims, fc4_dims
         model.add(keras.layers.Dense(fc4_dims, activation='relu'))
     model.add(keras.layers.Dense(action_dim))
     model.compile(optimizer=keras.optimizers.Adam(learning_rate=lr), loss='mean_squared_error')
-    print ("DQN SUMMARY")
     print(model.summary())
     return model
 """
@@ -90,7 +115,7 @@ class Agent():
             return
         
         if self.learn_count % self.replace == 0:
-            self.q_next.set_weights(self.q_eval.get_weights())
+            self.update_target_network()
         
         states, actions, rewards, states_, dones = self.memory.sample_buffer(self.batch_size)
         q_pred = self.q_eval.predict_on_batch(states)
@@ -105,11 +130,13 @@ class Agent():
         return self.q_eval.train_on_batch(states, q_target)
     
     def update_target_network(self):
-        self.target_network.set_weights(self.q_eval.get_weights())
+        self.q_next.set_weights(self.q_eval.get_weights())
 
     def save_model(self):
         self.q_eval.save(self.model_file)
+        self.memory.save()
 
     def load_model(self):
         self.q_eval = keras.models.load_model(self.model_file)
         self.q_next = keras.models.load_model(self.model_file)
+        self.memory.load()
