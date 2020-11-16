@@ -28,17 +28,15 @@ if __name__ == "__main__":
     tf.compat.v1.disable_eager_execution()
     env = FlappyGame()
     lr = 0.001
-    n_games = 1000
+    n_games = 1500
     agent = Agent(gamma=0.99, epsilon=1.0, lr=lr, input_dims=(7,), action_dim=2, mem_size=1000000, batch_size=128,
-    epsilon_end=0.003, epsilon_dec=1e-5, fname='dqn_model_flappy_V6.h5', 
-    fc1_dims=128, fc2_dims=64, fc3_dims=32, fc4_dims=16, replace=1000)
+    epsilon_end=0.001, epsilon_dec=1e-5, fname='dqn_model_flappy_V7.h5', 
+    fc1_dims=512, fc2_dims=256, fc3_dims=32, fc4_dims=0, replace=1000)
     
     # frame_analyze = FrameAnalyze((4,128,76), (8,))
-    if (os.path.exists(agent.model_file)):
-        agent.load_model()
-        agent.epsilon = 0.01
+    agent.load_model()
         # agent.eps_min = 0.00
-        print ("Loaded model from ", agent.model_file)
+    print ("Loaded model from ", agent.model_file)
     # if (os.path.exists(frame_analyze.model_file)):
     #     frame_analyze.load_model()
     #     print ("Loaded CNN from ", frame_analyze.model_file)

@@ -130,13 +130,23 @@ class Agent():
         return self.q_eval.train_on_batch(states, q_target)
     
     def update_target_network(self):
-        self.q_next.set_weights(self.q_eval.get_weights())
+        tau = 0.9
+        next = self.q_next.get_weights()
+        eval = self.q_eval.get_weights()
+        new_weights = []
+        for x in range(len(next)):
+            new_weights.append(next[x] * (1-tau) + eval[x] * tau)
+        
+        # new_weights = self.q_next.get_weights() * (1-tau) + self.q_eval.get_weights() * tau
+        self.q_next.set_weights(new_weights)
 
     def save_model(self):
         self.q_eval.save(self.model_file)
         self.memory.save()
 
     def load_model(self):
-        self.q_eval = keras.models.load_model(self.model_file)
-        self.q_next = keras.models.load_model(self.model_file)
+        if (os.path.exists(self.model_file)):
+            self.q_eval = keras.models.load_model(self.model_file)
+            self.q_next = keras.models.load_model(self.model_file)
+            self.epsilon = 0.04
         self.memory.load()
