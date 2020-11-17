@@ -274,7 +274,7 @@ class FlappyGame:
         playerSurface = pygame.transform.rotate(self.IMAGES['player'][self.playerIndex], self.visibleRot)
         self.SCREEN.blit(playerSurface, (self.playerx, self.playery))
         pygame.display.update()
-        # self.FPSCLOCK.tick(self.FPS)
+        self.FPSCLOCK.tick(self.FPS)
         return reward
 
     def _getValues(self):
