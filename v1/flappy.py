@@ -197,21 +197,26 @@ class FlappyGame:
         
         if self.done:
             return 0
-        crashTest = self.checkCrash({'x': self.playerx, 'y': self.playery, 'index': self.playerIndex},
+        else:
+            reward += 1
+        crashTest, upperPCrash = self.checkCrash({'x': self.playerx, 'y': self.playery, 'index': self.playerIndex},
                             self.upperPipes, self.lowerPipes)
         if crashTest[0]:
             pipeMidY, playerPosY, nextIndex = getNextPipeMidValue()
             self.done = True
-            return -1 * math.sqrt((pipeMidY - playerPosY) ** 2 + (self.upperPipes[nextIndex]['x'] - self.playerx) ** 2)
-            # return a
-        # check for score
+            if crashTest[1]:
+                return -2000
+            elif upperPCrash:
+                return -1500
+            # return -1 * math.sqrt((pipeMidY - playerPosY) ** 2 + (self.upperPipes[nextIndex]['x'] - self.playerx) ** 2)
+            return -1000
         playerMidPos = self.playerx + self.IMAGES['player'][0].get_width() / 2
         for pipe in self.upperPipes:
             pipeMidPos = pipe['x'] + self.IMAGES['pipe'][0].get_width() / 2
             if pipeMidPos <= playerMidPos < pipeMidPos + 4:
                 self.score += 1
                 # self.SOUNDS['point'].play()
-                reward += 300
+                reward += 10
 
         if (self.loopIter + 1) % 3 == 0:
             self.playerIndex = next(self.playerIndexGen)
@@ -269,7 +274,7 @@ class FlappyGame:
         playerSurface = pygame.transform.rotate(self.IMAGES['player'][self.playerIndex], self.visibleRot)
         self.SCREEN.blit(playerSurface, (self.playerx, self.playery))
         pygame.display.update()
-        self.FPSCLOCK.tick(self.FPS)
+        # self.FPSCLOCK.tick(self.FPS)
         return reward
 
     def _getValues(self):
@@ -289,7 +294,7 @@ class FlappyGame:
             targetBottom2 = self.SCREENHEIGHT / 2 + self.PIPEGAPSIZE / 2
             targetX2 = 200
         # print ([playerPosY, self.playerVelY, self.upperPipes[nextPipe]['x'], targetTop, targetBottom, targetX2, targetTop2, targetBottom2])
-        return np.array([playerPosY, self.playerVelY, self.upperPipes[nextPipe]['x'], targetTop, targetBottom, targetX2, targetTop2, targetBottom2])
+        return np.array([playerPosY, self.playerVelY, self.upperPipes[nextPipe]['x'], (targetTop + targetBottom) / 2, targetX2, (targetTop2 + targetBottom2) / 2, self.playerRot])
 
     def _getScreen(self):
         img = pygame.surfarray.array3d(self.SCREEN)
@@ -346,7 +351,7 @@ class FlappyGame:
 
         # if player crashes into ground
         if player['y'] + player['h'] >= self.BASEY - 1:
-            return [True, True]
+            return [True, True], False
         else:
             playerRect = pygame.Rect(player['x'], player['y'],
                         player['w'], player['h'])
@@ -368,9 +373,9 @@ class FlappyGame:
                 lCollide = self.pixelCollision(playerRect, lPipeRect, pHitMask, lHitmask)
 
                 if uCollide or lCollide:
-                    return [True, False]
+                    return [True, False], uCollide
 
-        return [False, False]
+        return [False, False], False
 
     def pixelCollision(self, rect1, rect2, hitmask1, hitmask2):
         """Checks if two objects collide and not just their rects"""
