@@ -12,5 +12,9 @@ Average score over 100 games is approximately 65 after training. Looking to impr
 
 
 ## Credits
+
+## References
+Mnih, Volodymyr, et al. “Human-Level Control through Deep Reinforcement Learning.” Nature News, Nature Publishing Group, 25 Feb. 2015, www.nature.com/articles/nature14236. 
+
 - Used a Modified version of the Open-Source Flappy Bird Game from https://github.com/sourabhv/FlapPyBird
 - QNetwork implementation inspiration from https://www.youtube.com/channel/UC58v9cLitc8VaCjrcKyAbrw
