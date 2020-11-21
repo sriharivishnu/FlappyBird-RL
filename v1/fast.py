@@ -4,7 +4,6 @@ import random
 import sys
 import matplotlib.pyplot as plt
 import pygame
-import math
 import numpy as np
 import cv2
 from skimage import color as colour

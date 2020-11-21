@@ -73,19 +73,20 @@ def build_dqn(lr, action_dim, input_dims, fc1_dims, fc2_dims, fc3_dims, fc4_dims
     print(model.summary())
     return model
 """
-V3, V4: 128, 64, 32
 V6: 128, 64, 32, 4
 V7: 512, 256, 32, 0 (Best)
+
 """
 class Agent():
     def __init__(self, lr, gamma, action_dim, epsilon, batch_size,
     input_dims, epsilon_dec=1e-3, epsilon_end=0.01, mem_size=1000000, fname='dqn_model_flappy_V7.h5',
-    fc1_dims=128, fc2_dims=64, fc3_dims=32, fc4_dims=4, replace=100):
+    fc1_dims=128, fc2_dims=64, fc3_dims=32, fc4_dims=4, replace=100, tau = 0.7):
         self.action_space = [i for i in range(action_dim)]
         self.gamma = gamma
         self.epsilon = epsilon
         self.epsilon_dec = epsilon_dec
         self.eps_min = epsilon_end 
+        self.tau = tau
         self.replace = replace
 
         self.batch_size = batch_size
@@ -131,15 +132,13 @@ class Agent():
         return self.q_eval.train_on_batch(states, q_target)
     
     def update_target_network(self):
-        tau = 0.7
         next = self.q_next.get_weights()
         eval = self.q_eval.get_weights()
         new_weights = []
         for x in range(len(next)):
-            new_weights.append(next[x] * (1-tau) + eval[x] * tau)
-        
-        # new_weights = self.q_next.get_weights() * (1-tau) + self.q_eval.get_weights() * tau
+            new_weights.append(next[x] * (1-self.tau) + eval[x] * self.tau)
         self.q_next.set_weights(new_weights)
+        # self.q_next.set_weights(list(map(lambda x,y : x * (1-self.tau) + y * self.tau, next, eval)))
 
     def save_model(self):
         self.q_eval.save(self.model_file)

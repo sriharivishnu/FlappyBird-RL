@@ -1,11 +1,8 @@
-from flappy import FlappyGame
-from random import random
+from skimage import color
+from fast import FlappyGame
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
-import os
-import gym
-import cv2
 from cnn import FrameAnalyze
 from QNetwork import Agent
 """
@@ -28,10 +25,10 @@ if __name__ == "__main__":
     tf.compat.v1.disable_eager_execution()
     env = FlappyGame()
     lr = 0.001
-    n_games = 1000
+    n_games = 100
     agent = Agent(gamma=0.99, epsilon=1.0, lr=lr, input_dims=(7,), action_dim=2, mem_size=1000000, batch_size=128,
-    epsilon_end=0.001, epsilon_dec=1e-5, fname='dqn_model_flappy_V7.h5', 
-    fc1_dims=512, fc2_dims=256, fc3_dims=32, fc4_dims=0, replace=1000)
+    epsilon_end=0.001, epsilon_dec=1e-5, fname='dqn_model_flappy_V8.h5', 
+    fc1_dims=512, fc2_dims=256, fc3_dims=32, fc4_dims=0, replace=1000, tau=0.7)
     
     # frame_analyze = FrameAnalyze((4,128,76), (8,))
     agent.load_model()
@@ -65,18 +62,21 @@ if __name__ == "__main__":
         scores.append(env.score)
 
         avg_score = np.mean(scores[-100:])
-        print ('episode: ', i, '| score %.2f' % env.score, 
-                '| average score %.2f' % avg_score,
-                '| reward for episode: ', total_reward,
-                '| epsilon %.2f' % agent.epsilon,
-                '| mem_cntr', agent.memory.mem_cntr)
+        if (i % 10 == 0):
+            print ('episode: ', i, 
+                    '| average score %.2f' % avg_score,
+                    '| best score ', np.max(scores[-10:]),
+                    '| reward for episode: ', total_reward,
+                    '| epsilon %.2f' % agent.epsilon,
+                    '| mem_cntr', agent.memory.mem_cntr)
     
     print ("Saving model to'", agent.model_file, "'. Please wait...")
     agent.save_model()
     # frame_analyze.save_model()
     print ("Saved Models")
-    # plt.title("Cost vs Batches")
-    # plt.plot(list(range(len(frame_analyze.history))), frame_analyze.history)
+    plt.title("Game Data")
+    plt.plot(list(range(len(scores))), scores, color="blue")
+    plt.plot(list(range(len(eps_hist))), eps_hist, color="orange")
     plt.show()
 
     
