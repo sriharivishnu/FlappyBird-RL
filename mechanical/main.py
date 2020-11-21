@@ -20,12 +20,12 @@ if __name__ == "__main__":
     lr = 0.001
     n_games = 900
     agent = Agent(gamma=0.99, epsilon=1.0, lr=lr, input_dims=(6,), action_dim=2, mem_size=1000000, batch_size=128,
-    epsilon_end=0.001, epsilon_dec=1e-5, fname='dqn_model_flappy_V8.h5', 
-    fc1_dims=512, fc2_dims=256, fc3_dims=32, fc4_dims=0, replace=1000, tau=0.9)
+    epsilon_end=0.001, epsilon_dec=1e-4, fname='dqn_model_flappy_V8.h5', 
+    fc1_dims=256, fc2_dims=128, fc3_dims=32, fc4_dims=0, replace=1000, tau=0.9)
     agent.load_model()
     print ("Loaded model from ", agent.model_file)
     print ("Looking for connection to Arduino...")
-    conn = Connection('/dev/tty.usbmodem14101', 9600)
+    # conn = Connection('/dev/tty.usbmodem14101', 9600)
     print ("Connected")
     # Initialize scores and epsilon history
     scores = []
@@ -36,8 +36,8 @@ if __name__ == "__main__":
         total_reward = 0
         while not done:
             action = agent.choose_action(observation)
-            if action == 1:
-                conn.sendTap()
+            # if action == 1:
+            #     conn.sendTap()
             observation_, reward, done, time, score = env.step(action)
             observation_ = preprocessObservation(observation_, env)
             total_reward += reward
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         # if (i % 10 == 0):
         print ('episode: ', i, 
                 '| average score %.2f' % avg_score,
-                '| best score ', np.max(scores[-10:]),
+                '| score ', env.score,
                 '| reward for episode: ', total_reward,
                 '| epsilon %.2f' % agent.epsilon,
                 '| mem_cntr', agent.memory.mem_cntr)

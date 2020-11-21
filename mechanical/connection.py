@@ -8,3 +8,10 @@ class Connection():
     
     def sendTap(self):
         self.serial.write(b"1\n")
+    
+    def sendTapAndWait(self):
+        self.serial.write(b"1\n")
+        while True:
+            line = self.serial.readline().decode('utf-8').rstrip().strip()
+            if line == "1":
+                break

@@ -25,7 +25,7 @@ if __name__ == "__main__":
     tf.compat.v1.disable_eager_execution()
     env = FlappyGame()
     lr = 0.001
-    n_games = 100
+    n_games = 1000
     agent = Agent(gamma=0.99, epsilon=1.0, lr=lr, input_dims=(7,), action_dim=2, mem_size=1000000, batch_size=128,
     epsilon_end=0.001, epsilon_dec=1e-5, fname='dqn_model_flappy_V8.h5', 
     fc1_dims=512, fc2_dims=256, fc3_dims=32, fc4_dims=0, replace=1000, tau=0.7)

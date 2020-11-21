@@ -172,21 +172,10 @@ class FlappyGame:
         #             self.playerFlapped = True
                     # self.SOUNDS['wing'].play()
         #--------
-        if pygame.key.get_pressed()[pygame.K_SPACE]:
-            self.playerVelY = self.playerFlapAcc
-            self.playerFlapped = True
-
-        def getNextPipeMidValue():
-            playerPosY = self.playery + self.IMAGES['player'][0].get_height() / 2
-            pipeWidth = self.IMAGES['pipe'][0].get_width()
-            if len(self.upperPipes) > 0:
-                nextPipe = 0
-                while nextPipe < len(self.upperPipes) and self.upperPipes[nextPipe]['x'] + pipeWidth < self.playerx:
-                    nextPipe += 1
-                targetTop = self.upperPipes[nextPipe]['y'] + self.IMAGES['pipe'][nextPipe].get_height()
-                targetBottom = self.lowerPipes[nextPipe]['y']
-                return (targetTop + targetBottom) / 2, playerPosY, nextPipe
-            return 0, playerPosY, 0
+        if (pygame.key.get_pressed()[pygame.K_SPACE] or action == 1) and not self.done:
+            if self.playery > -2 * self.IMAGES['player'][0].get_height():
+                self.playerVelY = self.playerFlapAcc
+                self.playerFlapped = True
         
         if self.done:
             return 0
@@ -195,7 +184,6 @@ class FlappyGame:
         crashTest, upperPCrash = self.checkCrash({'x': self.playerx, 'y': self.playery, 'index': self.playerIndex},
                             self.upperPipes, self.lowerPipes)
         if crashTest[0]:
-            pipeMidY, playerPosY, nextIndex = getNextPipeMidValue()
             self.done = True
             if crashTest[1]:
                 return -2000
