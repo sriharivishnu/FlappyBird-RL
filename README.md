@@ -9,7 +9,7 @@ Average score over 100 games is approximately 65 after training. Looking to impr
 <img width="962" alt="Screen Shot 2020-11-16 at 9 24 59 PM" src="https://user-images.githubusercontent.com/37857112/99344606-75017a00-285e-11eb-9a6f-face7ebca2e1.png">
 
 ## Work in Progress
-- Arduino-controlled "tapper"
+- Arduino-controlled "tapper". Needs to account for control delay.
 - Using raw pixel data with a CNN
 
 ## References
