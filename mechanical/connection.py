@@ -9,6 +9,9 @@ class Connection():
     def sendTap(self):
         self.serial.write(b"1\n")
     
+    def sendAction(self, action):
+        self.serial.write(str.encode(str(action) + '\n'))
+    
     def sendTapAndWait(self):
         self.serial.write(b"1\n")
         while True:

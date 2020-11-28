@@ -6,17 +6,20 @@ import matplotlib.pyplot as plt
 import pygame
 import numpy as np
 import cv2
+import math
 from skimage import color as colour
 from skimage.transform import resize, downscale_local_mean
 from pygame.locals import *
 
 class FlappyGame:
-    def __init__(self):
+    def __init__(self, fast = False):
         self.FPS = 30
         self.SCREENWIDTH  = 288
         self.SCREENHEIGHT = 512
         self.PIPEGAPSIZE  = 100 # gap between upper and lower part of pipe
         self.BASEY        = self.SCREENHEIGHT * 0.79
+
+        self.fast_mode = fast
         # image, sound and hitmask  dicts
         self.IMAGES, self.SOUNDS, self.HITMASKS = {}, {}, {}
 
@@ -160,6 +163,15 @@ class FlappyGame:
         return self._getValues(), reward, self.done, self.time, self.score
 
     def act(self, action):
+        def getNextPipeMidValue():
+            playerPosY = self.playery + self.IMAGES['player'][0].get_height() / 2
+            pipeWidth = self.IMAGES['pipe'][0].get_width()
+            nextPipe = 0
+            while nextPipe < len(self.upperPipes) and self.upperPipes[nextPipe]['x'] + pipeWidth < self.playerx:
+                nextPipe += 1
+            targetTop = self.upperPipes[nextPipe]['y'] + self.IMAGES['pipe'][nextPipe].get_height()
+            targetBottom = self.lowerPipes[nextPipe]['y']
+            return (targetTop + targetBottom) / 2, playerPosY, nextPipe
         #DEBUGGING
         #----------
         self.time += 1
@@ -177,6 +189,7 @@ class FlappyGame:
                 self.playerVelY = self.playerFlapAcc
                 self.playerFlapped = True
         
+        #assign rewards
         if self.done:
             return 0
         else:
@@ -185,12 +198,16 @@ class FlappyGame:
                             self.upperPipes, self.lowerPipes)
         if crashTest[0]:
             self.done = True
-            if crashTest[1]:
-                return -2000
-            elif upperPCrash:
-                return -1500
-            # return -1 * math.sqrt((pipeMidY - playerPosY) ** 2 + (self.upperPipes[nextIndex]['x'] - self.playerx) ** 2)
-            return -1000
+            pipeMidY, playerPosY, nextIndex = getNextPipeMidValue()
+            # if crashTest[1]:
+            #     return -2000
+            # elif upperPCrash:
+            #     return -1500
+            return -1 * math.sqrt((pipeMidY - playerPosY) ** 2 + (self.upperPipes[nextIndex]['x'] - self.playerx) ** 2) - 1000
+            # return -1000
+        if self.playery < 0:
+            reward -= 2
+            
         playerMidPos = self.playerx + self.IMAGES['player'][0].get_width() / 2
         for pipe in self.upperPipes:
             pipeMidPos = pipe['x'] + self.IMAGES['pipe'][0].get_width() / 2
@@ -255,7 +272,8 @@ class FlappyGame:
         playerSurface = pygame.transform.rotate(self.IMAGES['player'][self.playerIndex], self.visibleRot)
         self.SCREEN.blit(playerSurface, (self.playerx, self.playery))
         pygame.display.update()
-        self.FPSCLOCK.tick(self.FPS)
+        if (not self.fast_mode):
+            self.FPSCLOCK.tick(self.FPS)
         return reward
 
     def _getValues(self):

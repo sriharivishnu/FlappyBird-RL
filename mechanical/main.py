@@ -3,6 +3,7 @@ from flappy import FlappyGame
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
+import time
 from connection import Connection
 from QNetwork import Agent
 """
@@ -16,16 +17,16 @@ def preprocessObservation(observation : np.array, game : FlappyGame):
 
 if __name__ == "__main__":
     tf.compat.v1.disable_eager_execution()
-    env = FlappyGame()
+    env = FlappyGame(fast=False)
     lr = 0.001
-    n_games = 900
+    n_games = 500
     agent = Agent(gamma=0.99, epsilon=1.0, lr=lr, input_dims=(6,), action_dim=2, mem_size=1000000, batch_size=128,
-    epsilon_end=0.001, epsilon_dec=1e-4, fname='dqn_model_flappy_V8.h5', 
-    fc1_dims=256, fc2_dims=128, fc3_dims=32, fc4_dims=0, replace=1000, tau=0.9)
+    epsilon_end=0.001, epsilon_dec=5e-5, fname='dqn_model_flappy_V9.h5', 
+    fc1_dims=512, fc2_dims=256, fc3_dims=32, fc4_dims=0, replace=1000, tau=0.8)
     agent.load_model()
     print ("Loaded model from ", agent.model_file)
     print ("Looking for connection to Arduino...")
-    # conn = Connection('/dev/tty.usbmodem14101', 9600)
+    conn = Connection('/dev/tty.usbmodem14101', 9600)
     print ("Connected")
     # Initialize scores and epsilon history
     scores = []
@@ -34,17 +35,19 @@ if __name__ == "__main__":
         done = False
         observation = preprocessObservation(env.reset(), env)
         total_reward = 0
+        queue = []
         while not done:
+            start = time.time()
             action = agent.choose_action(observation)
-            # if action == 1:
-            #     conn.sendTap()
-            observation_, reward, done, time, score = env.step(action)
+            conn.sendAction(action)
+            observation_, reward, done, timestep, score = env.step(action)
             observation_ = preprocessObservation(observation_, env)
             total_reward += reward
             agent.store_transition(observation, action, reward, observation_, done)
             agent.learn()
             # frame_analyze.learn_vision()
             observation = observation_
+            print ((time.time() - start) * 1000)
         
         eps_hist.append(agent.epsilon)
         scores.append(env.score)
