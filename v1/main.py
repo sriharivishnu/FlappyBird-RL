@@ -1,5 +1,5 @@
 from skimage import color
-from fast import FlappyGame
+from flappy import FlappyGame
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
@@ -62,13 +62,13 @@ if __name__ == "__main__":
         scores.append(env.score)
 
         avg_score = np.mean(scores[-100:])
-        if (i % 10 == 0):
-            print ('episode: ', i, 
-                    '| average score %.2f' % avg_score,
-                    '| best score ', np.max(scores[-10:]),
-                    '| reward for episode: ', total_reward,
-                    '| epsilon %.2f' % agent.epsilon,
-                    '| mem_cntr', agent.memory.mem_cntr)
+        # if (i % 10 == 0):
+        print ('episode: ', i, 
+                '| average score %.2f' % avg_score,
+                '| best score ', np.max(scores[-10:]),
+                '| reward for episode: ', total_reward,
+                '| epsilon %.2f' % agent.epsilon,
+                '| mem_cntr', agent.memory.mem_cntr)
     
     print ("Saving model to'", agent.model_file, "'. Please wait...")
     agent.save_model()
